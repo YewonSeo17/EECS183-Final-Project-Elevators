@@ -28,12 +28,15 @@
 
 using namespace std;
 
-// declare your test functions here
+void test_Person();
 
 void start_tests() {
-    // call your test functions here
+    test_Person();
     
     return;
 }
 
-// write test functions here
+void test_Person() {
+    Person p1("0f1t9a1");
+    cout << p1.getTurn() << " " << p1.getCurrentFloor() << " " << p1.getTargetFloor() << " " << p1.getAngerLevel() << endl;
+}

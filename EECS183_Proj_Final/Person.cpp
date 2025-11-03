@@ -18,10 +18,10 @@
 using namespace std;
 
 Person::Person(string inputString) : Person() {
-    turn = inputString[0];
-    currentFloor = inputString[2];
-    targetFloor = inputString[4];
-    angerLevel = inputString[6];
+    turn = inputString[0] - '0';
+    currentFloor = inputString[2] - '0';
+    targetFloor = inputString[4] - '0';
+    angerLevel = inputString[6] - '0';
 }
 
 bool Person::tick(int currentTime) {
