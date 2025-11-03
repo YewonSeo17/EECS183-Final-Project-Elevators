@@ -18,6 +18,7 @@
 
 string getAIMoveString(const BuildingState& buildingState) {
     // comment
+    // comment 1
     return "";
 }
 
