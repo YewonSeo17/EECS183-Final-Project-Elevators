@@ -16,7 +16,9 @@
 using namespace std;
 
 void Elevator::tick(int currentTime) {
-    //TODO: Implement tick
+    if (currentTime % TICKS_PER_ELEVATOR_MOVE == 0) {
+
+    }
 }
 
 void Elevator::serviceRequest(int floorNum) {
