@@ -39,4 +39,7 @@ void start_tests() {
 void test_Person() {
     Person p1("0f1t9a1");
     cout << p1.getTurn() << " " << p1.getCurrentFloor() << " " << p1.getTargetFloor() << " " << p1.getAngerLevel() << endl;
+    Person p2("77f1t9a1");
+    cout << p2.getTurn() << " " << p2.getCurrentFloor() << " " << p2.getTargetFloor() << " " << p2.getAngerLevel() << endl;
+
 }

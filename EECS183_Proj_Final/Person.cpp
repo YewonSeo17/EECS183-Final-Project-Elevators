@@ -18,10 +18,22 @@
 using namespace std;
 
 Person::Person(string inputString) : Person() {
-    turn = inputString[0] - '0';
-    currentFloor = inputString[2] - '0';
-    targetFloor = inputString[4] - '0';
-    angerLevel = inputString[6] - '0';
+
+    // if turn is a 2-digit integer
+    if (inputString.length() == 8) {
+
+        // taking first two chars of inputString
+        turn = (inputString[0] - '0') * 10 + (inputString[1] - '0');
+        currentFloor = inputString[3] - '0';
+        targetFloor = inputString[5] - '0';
+        angerLevel = inputString[7] - '0';
+    } 
+    else {
+        turn = inputString[0] - '0';
+        currentFloor = inputString[2] - '0';
+        targetFloor = inputString[4] - '0';
+        angerLevel = inputString[6] - '0';
+    }
 }
 
 bool Person::tick(int currentTime) {
