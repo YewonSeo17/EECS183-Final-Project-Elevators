@@ -30,23 +30,55 @@ using namespace std;
 
 void test_Person();
 void test_Floor();
+void test_Elevator();
 
 void start_tests() {
     test_Person();
+    test_Elevator();
     test_Floor();
     
     return;
 }
 
 void test_Person() {
+    cout << "Testing Person" << endl;
+   
     Person p1("0f1t9a1");
     cout << p1.getTurn() << " " << p1.getCurrentFloor() << " " << p1.getTargetFloor() << " " << p1.getAngerLevel() << endl;
     Person p2("77f1t9a1");
     cout << p2.getTurn() << " " << p2.getCurrentFloor() << " " << p2.getTargetFloor() << " " << p2.getAngerLevel() << endl;
 
 }
+void test_Elevator() {
+    cout << "Now Testing Elevator" << endl;
+    cout << "Testing serviceRequest()" << endl;
+    Elevator M1;
+    M1.serviceRequest(5);
+    
+    cout << "M1.serviceRequest() " << "Expected 5; Actual: " << M1.getTargetFloor() << endl;
+    cout << "M1.serviceRequest() " << "Expected 1; Actual: " << M1.isServicing() << endl;
 
+    cout << "Testing tick()" << endl;
+
+    M1.tick(3);
+
+    cout << "M1.tick(3) " << "Expected 1; Actual: " << M1.getCurrentFloor() << endl;
+    cout << "M1.tick(3) " << "Expected 1; Actual: " << M1.isServicing() << endl;
+
+    M1.tick(3);
+    M1.tick(3);
+    M1.tick(3);
+    M1.tick(3);
+
+    cout << "M1.tick(3) " << "Expected 5; Actual: " << M1.getCurrentFloor() << endl;
+    cout << "M1.tick(3) " << "Expected 0; Actual: " << M1.isServicing() << endl;
+   
+
+
+    return;
+}
 void test_Floor() {
+    cout << "Testing Floor" << endl;
     Person p1("0f1t9a1");
     Floor f1;
     f1.addPerson(p1, 3);
