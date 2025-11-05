@@ -58,14 +58,10 @@ void Floor::removePeople(const int indicesToRemove[MAX_PEOPLE_PER_FLOOR],
 	// arrPos tracks index of newArr
 	int arrPos = 0;
 
-
 	for (int i = 0; i < numPeople; ++i) {
 		bool toRemove = false;
 		for (int j = 0; j < numPeopleToRemove; ++j) {
-			if (i == indicesToRemove[j]) { 
-				toRemove = true;
-				break; 
-			}
+			if (i == indicesToRemove[j]) { toRemove = true; break; }
 		}
 		if (!toRemove) {
 			newArr[arrPos++] = people[i];
