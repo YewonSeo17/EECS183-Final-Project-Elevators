@@ -34,8 +34,9 @@ Move::Move(string commandString) : Move() {
         return;
     }
 
-    // if commandString starts with 'e'
-    elevatorId = commandString[1];
+    // if commandString starts with 'e'\
+    // must convert char to int
+    elevatorId = commandString[1] - '0';
 
     char action = commandString[2];
     if (action == 'p' || action == 'P') {
@@ -43,7 +44,7 @@ Move::Move(string commandString) : Move() {
         return;
     }
     else if (action == 'f' || action == 'F') {
-        targetFloor = commandString[3];
+        targetFloor = commandString[3] - '0';
         return;
     }
 

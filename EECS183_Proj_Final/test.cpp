@@ -143,7 +143,7 @@ void test_Move() {
     cout << "\nTesting Move\n";
     cout << "Testing non default constructor\n";
 
-    /*Move m0("e1f4");
+    Move m0("e1f4");
     Move m1("e1p");
     Move m2("e5f0");
     Move m3("");
@@ -160,11 +160,15 @@ void test_Move() {
     elevs[2].serviceRequest(2);
 
     cout << "Expected: 1, Actual: " << m0.isValidMove(elevs);
-    cout << "Expected: 1, Actual: " << m1.isValidMove(elevs);
-    cout << "Expected: 0, Actual: " << m2.isValidMove(elevs);
-    cout << "Expected: 1, Actual: " << m3.isValidMove(elevs);
-    cout << "Expected: 1, Actual: " << m4.isValidMove(elevs);
-    cout << "Expected: 1, Actual: " << m5.isValidMove(elevs);
-    cout << "Expected: 0, Actual: " << m6.isValidMove(elevs);*/
+    cout << "\nExpected: 1, Actual: " << m1.isValidMove(elevs);
+    cout << "\nExpected: 0, Actual: " << m2.isValidMove(elevs);
+    cout << "\nExpected: 1, Actual: " << m3.isValidMove(elevs);
+    cout << "\nExpected: 1, Actual: " << m4.isValidMove(elevs);
+    cout << "\nExpected: 1, Actual: " << m5.isValidMove(elevs);
+    cout << "\nExpected: 0, Actual: " << m6.isValidMove(elevs);
+
+    cout << "\nExpected: 1, Actual: " << m0.getElevatorId();
+    cout << "\nExpected: -1, Actual: " << m3.getElevatorId();
+    cout << "\nExpected: 9, Actual: " << m6.getElevatorId();
     return;
 }
