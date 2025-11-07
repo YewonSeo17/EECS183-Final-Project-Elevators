@@ -19,19 +19,64 @@
 using namespace std;
 
 Move::Move(string commandString) : Move() {
-    //TODO: Implement non-default constructor
+    elevatorId = commandString[1];
+
+    if (commandString[2] == 'f') {
+        targetFloor = commandString[3];
+    }
+    else if (commandString[2] == 'p') {
+        isPickup = true;
+    }
+    else if (commandString == "") {
+        isPass = true;
+    }
+    else if (commandString == "S") {
+        isSave = true;
+    }
+    else if (commandString == "Q") {
+        isQuit = true;
+    }
 }
 
 bool Move::isValidMove(Elevator elevators[NUM_ELEVATORS]) const {
-    //TODO: Implement isValidMove
-    
-    //Returning false to prevent compilation error
+    if (isPass || isQuit || isSave) {
+        return true;
+    }
+    if (elevatorId >= 0 && elevatorId < NUM_ELEVATORS && !elevators[elevatorId].isServicing()) {
+
+        // for pickup move
+        if (isPickup) {
+            return true;
+        }
+
+        // for servicing move
+        if (targetFloor >= 0 && targetFloor < NUM_FLOORS 
+            && targetFloor != elevators[elevatorId].getCurrentFloor()) {
+            return true;
+        }
+    }
     return false;
 }
 
 void Move::setPeopleToPickup(const string& pickupList, const int currentFloor, 
                              const Floor& pickupFloor) {
-    //TODO: Implement setPeopleToPickup
+    numPeopleToPickup = 0;
+    totalSatisfaction = 0;
+    int distance = 0;
+    int target = 0;
+
+    for (int i = 0; i < pickupList.length(); ++i) {
+        peopleToPickup[i] = pickupList[i];
+        ++numPeopleToPickup;
+        totalSatisfaction += MAX_ANGER - pickupFloor.getPersonByIndex(i).getAngerLevel();
+        target = pickupFloor.getPersonByIndex(i).getTargetFloor();
+        
+        // set targetFloor to the target floor of person who should travel furtherest
+        if (distance < abs(target - currentFloor)) {
+            distance = abs(target - currentFloor);
+            targetFloor = target;
+        }
+    }
 }
 
 //////////////////////////////////////////////////////
