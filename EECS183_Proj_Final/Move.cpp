@@ -81,10 +81,11 @@ void Move::setPeopleToPickup(const string& pickupList, const int currentFloor,
     for (int i = 0; i < pickupList.length(); ++i) {
 
         // pickupList is a string and peopleToPickup is an int arr
-        peopleToPickup[i] = pickupList[i] - '0';
+        int personIndex = pickupList[i] - '0';
+        peopleToPickup[i] = personIndex;
         ++numPeopleToPickup;
-        totalSatisfaction += MAX_ANGER - pickupFloor.getPersonByIndex(i).getAngerLevel();
-        target = pickupFloor.getPersonByIndex(i).getTargetFloor();
+        totalSatisfaction += MAX_ANGER - pickupFloor.getPersonByIndex(personIndex).getAngerLevel();
+        target = pickupFloor.getPersonByIndex(personIndex).getTargetFloor();
         
         // set targetFloor to the target floor of person who should travel furtherest
         if (distance < abs(target - currentFloor)) {
