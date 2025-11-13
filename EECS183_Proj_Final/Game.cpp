@@ -28,7 +28,13 @@ void Game::playGame(bool isAIModeIn, ifstream& gameFile) {
     std::uniform_int_distribution<> floorDist(0, 9);
     std::uniform_int_distribution<> angerDist(0, 3);
 
-    // initialize the game
+    gameFile.open("game.in");
+
+    // if game input file is not open
+    if (!gameFile.is_open()) {
+        exit(1);
+    }
+
     isAIMode = isAIModeIn;
     printGameStartPrompt();
     initGame(gameFile);
@@ -36,40 +42,42 @@ void Game::playGame(bool isAIModeIn, ifstream& gameFile) {
     /* play until checkForGameEnd() stops the program
      * you *will* modify this loop
      */
-    while (true) {
-        // random floor and targetFloor
-        // these two statements are not needed in the finished solution
-        int src = floorDist(gen);
-        int dst = floorDist(gen);
-        
-        /* check that the randomly generate floor and targetFloor differ
-         * none of this if statement will appear in your finished solution
-         * Persons will be read from the file instead */
-        if (src != dst) {
-            std::stringstream ss;
-            ss << "0f" << src << "t" << dst << "a" << angerDist(gen);
-            Person p(ss.str());
-            building.spawnPerson(p);
+
+    string pIn;
+    gameFile >> pIn;
+
+    while (gameFile.good()) {
+        Person p(pIn);
+
+        // Determine which tick the Person will be spawned
+        int tickToAdd = p.getTurn();
+
+        // until the tick of the person (p) reaches to the tick of the current round,
+        // the user plays game
+        while (tickToAdd > p.tick(building.getTime())) {
+
+            // print the state of the Building and check for end of game
+            building.prettyPrintBuilding(cout);
+            satisfactionIndex.printSatisfaction(cout, false);
+            checkForGameEnd();
+
+            // get and apply the next move
+            Move nextMove = getMove();
+            update(nextMove);
         }
 
-        // print the state of the Building and check for end of game
-        building.prettyPrintBuilding(cout);
-        satisfactionIndex.printSatisfaction(cout, false);
-        checkForGameEnd();
+        building.spawnPerson(p);
 
-        // get and apply the next move
-        Move nextMove = getMove();
-        update(nextMove);
+        gameFile >> pIn;
     }
 }
 
-// Stub for isValidPickupList for Core
-// You *must* revise this function according to the RME and spec
 bool Game::isValidPickupList(const string& pickupList, 
                              const int pickupFloorNum) const {
 
     bool noDup = true;
     bool inRange = true;
+    bool inRangeOfFloorPeople = true;
     bool elevCapa = (pickupList.length() <= ELEVATOR_CAPACITY);
     bool lessWait = (pickupList.length() 
         < building.getFloorByFloorNum(pickupFloorNum).getNumPeople());
@@ -97,13 +105,18 @@ bool Game::isValidPickupList(const string& pickupList,
         }
 
         if ((building.getFloorByFloorNum(pickupFloorNum)
-            .getPersonByIndex(pickupList[i]).getTargetFloor() > pickupFloorNum) != direction) {
+            .getPersonByIndex(pickupList[i]).getTargetFloor() > pickupFloorNum) 
+            != direction) {
             rightDirect = false;
+        }
+
+        if (pickupList[i] >= building.getFloorByFloorNum(pickupFloorNum).getNumPeople()) {
+            inRangeOfFloorPeople = false;
         }
     }
 
-
-    if (noDup && inRange && elevCapa && lessWait && rightDirect) {
+    if (noDup && inRange && elevCapa && lessWait && rightDirect 
+        && inRangeOfFloorPeople) {
         return true;
     }
 
