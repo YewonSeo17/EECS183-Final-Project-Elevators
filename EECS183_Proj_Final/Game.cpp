@@ -28,8 +28,6 @@ void Game::playGame(bool isAIModeIn, ifstream& gameFile) {
     std::uniform_int_distribution<> floorDist(0, 9);
     std::uniform_int_distribution<> angerDist(0, 3);
 
-    gameFile.open("game.in");
-
     // if game input file is not open
     if (!gameFile.is_open()) {
         exit(1);
@@ -68,6 +66,8 @@ void Game::playGame(bool isAIModeIn, ifstream& gameFile) {
 
         building.spawnPerson(p);
     }
+
+    return;
 }
 
 bool Game::isValidPickupList(const string& pickupList, 
