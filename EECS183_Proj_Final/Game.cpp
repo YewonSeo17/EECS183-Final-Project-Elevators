@@ -37,10 +37,6 @@ void Game::playGame(bool isAIModeIn, ifstream& gameFile) {
     printGameStartPrompt();
     initGame(gameFile);
 
-    /* play until checkForGameEnd() stops the program
-     * you *will* modify this loop
-     */
-
     string pIn;
 
     while (gameFile >> pIn) {
@@ -108,7 +104,7 @@ bool Game::isValidPickupList(const string& pickupList,
             rightDirect = false;
         }
 
-        if (pickupList[i] < building.getFloorByFloorNum(pickupFloorNum).getNumPeople()) {
+        if (pickupList[i] >= building.getFloorByFloorNum(pickupFloorNum).getNumPeople()) {
             inRangeOfFloorPeople = false;
         }
     }
