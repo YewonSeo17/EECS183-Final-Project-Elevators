@@ -17,16 +17,7 @@
 #include "Utility.h"
 using namespace std;
 
-// Stub for playGame for Core, which plays random games
-// You *must* revise this function according to the RME and spec
-// Code that will not appear in your solution is noted in the comments
 void Game::playGame(bool isAIModeIn, ifstream& gameFile) {
-    /* used to generate random numbers for spawning a randon Person
-     * these three statements will not be needed when you have
-     * finished this function */
-    std::mt19937 gen(1);
-    std::uniform_int_distribution<> floorDist(0, 9);
-    std::uniform_int_distribution<> angerDist(0, 3);
 
     // if game input file is not open
     if (!gameFile.is_open()) {
@@ -60,6 +51,15 @@ void Game::playGame(bool isAIModeIn, ifstream& gameFile) {
         }
 
         building.spawnPerson(p);
+    }
+
+    // playing after gameFile reaches to the end
+    while (true) {
+        building.prettyPrintBuilding(cout);
+        satisfactionIndex.printSatisfaction(cout, false);
+        checkForGameEnd();
+        Move nextMove = getMove();
+        update(nextMove);
     }
 
     return;
