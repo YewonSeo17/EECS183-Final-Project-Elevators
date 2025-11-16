@@ -57,7 +57,6 @@ void Game::playGame(bool isAIModeIn, ifstream& gameFile) {
             // get and apply the next move
             Move nextMove = getMove();
             update(nextMove);
-            building.tick(nextMove);
         }
 
         building.spawnPerson(p);
@@ -69,52 +68,60 @@ void Game::playGame(bool isAIModeIn, ifstream& gameFile) {
 bool Game::isValidPickupList(const string& pickupList, 
                              const int pickupFloorNum) const {
 
-    bool noDup = true;
-    bool inRange = true;
-    bool inRangeOfFloorPeople = true;
-    bool elevCapa = (pickupList.length() <= ELEVATOR_CAPACITY);
-    bool lessWait = (pickupList.length() 
-        < building.getFloorByFloorNum(pickupFloorNum).getNumPeople());
-    bool rightDirect = true;
+    const Floor& floor = building.getFloorByFloorNum(pickupFloorNum);
+    int numPeopleOnFloor = floor.getNumPeople();
 
-    // check duplicates
-    for (int i = 0; i < pickupList.length() - 1; ++i) {
-        for (int j = i + 1; j <= pickupList.length(); ++j) {
-            if (pickupList[i] == pickupList[j]) {
-                noDup = false;
-            }
+    // Length checks: can't exceed elevator capacity or number of people waiting
+    if (static_cast<int>(pickupList.length()) > ELEVATOR_CAPACITY) {
+        return false;
+    }
+    if (static_cast<int>(pickupList.length()) > numPeopleOnFloor) {
+        return false;
+    }
+
+    // Validate first character and determine direction
+    char c0 = pickupList[0];
+    if (c0 < '0' || c0 > '9') {
+        return false;
+    }
+    int idx0 = c0 - '0';
+    if (idx0 < 0 || idx0 >= numPeopleOnFloor) {
+        return false;
+    }
+
+    bool directionUp = (floor.getPersonByIndex(idx0).getTargetFloor() > pickupFloorNum);
+
+    // Track duplicates; size 10 covers digits '0'..'9'
+    bool seen[10] = { false };
+
+    for (size_t i = 0; i < pickupList.length(); ++i) {
+        char ch = pickupList[i];
+
+        // must be a digit
+        if (ch < '0' || ch > '9') {
+            return false;
+        }
+
+        int idx = ch - '0';
+
+        // index must reference an existing person on the floor
+        if (idx < 0 || idx >= numPeopleOnFloor) {
+            return false;
+        }
+
+        // no duplicates allowed
+        if (seen[idx]) {
+            return false;
+        }
+        seen[idx] = true;
+
+        // all chosen people must request the same direction
+        if ((floor.getPersonByIndex(idx).getTargetFloor() > pickupFloorNum) != directionUp) {
+            return false;
         }
     }
 
-    // check if the first person goes up or down
-    // if up, true; if down, false
-    bool direction = (building.getFloorByFloorNum(pickupFloorNum)
-        .getPersonByIndex(pickupList[0]).getTargetFloor() > pickupFloorNum);
-
-    for (int i = 0; i < pickupList.length(); ++i) {
-
-        // check if all pickupList members are in range
-        if (pickupList[i] < '0' && pickupList[i] > '9') {
-            inRange = false;
-        }
-
-        if ((building.getFloorByFloorNum(pickupFloorNum)
-            .getPersonByIndex(pickupList[i]).getTargetFloor() > pickupFloorNum) 
-            != direction) {
-            rightDirect = false;
-        }
-
-        if (pickupList[i] >= building.getFloorByFloorNum(pickupFloorNum).getNumPeople()) {
-            inRangeOfFloorPeople = false;
-        }
-    }
-
-    if (noDup && inRange && elevCapa && lessWait && rightDirect 
-        && inRangeOfFloorPeople) {
-        return true;
-    }
-
-    return false;
+    return true;
 }
 
 //////////////////////////////////////////////////////
