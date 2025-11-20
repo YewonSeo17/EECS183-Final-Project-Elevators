@@ -17,9 +17,8 @@
 // You do not need to make any changes to this file for the Core
 
 string getAIMoveString(const BuildingState& buildingState) {
-    // comment
-    // comment 1
-    // comment 2
+    // Winning Stategy 1: go to the floor that has people with highest anger levels.
+
     return "";
 }
 
