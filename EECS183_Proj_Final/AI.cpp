@@ -13,6 +13,7 @@
 #include "AI.h"
 #include <cassert>
 #include <string>
+#include "Game.h"
 using namespace std;
 
 // This file is used only in the Reach, not the Core.
@@ -25,7 +26,8 @@ string getAIMoveString(const BuildingState& buildingState) {
     int greatestAvgAnger = 0;
     int targetFloor = 0;
     string move = "e";
-    int elevId;
+    int elevId = 0;
+    int elevIdFinal = 0;
     int distance = 0;
     int shortestD = NUM_FLOORS;
 
@@ -59,6 +61,7 @@ string getAIMoveString(const BuildingState& buildingState) {
                 if (shortestD < distance) {
                     shortestD = distance;
                     move.append(to_string(elevId));
+                    elevIdFinal = elevId;
                 }
             }
         }
@@ -73,15 +76,69 @@ string getAIMoveString(const BuildingState& buildingState) {
         //            on the distance between the target floor & the elevator -> resolved
     }
 
+    // pick up when targetFloor == currentFloor of the elevator
+    if (targetFloor == buildingState.elevators[elevIdFinal].currentFloor) {
+        move.append("p");
+        return move;
+    }
+
+    // if not picking up, perform service move
     move.append("f");
     move.append(to_string(targetFloor));
-
-    // we should: pickup move
-
     return move;
 }
 
 string getAIPickupList(const Move& move, const BuildingState& buildingState, 
                        const Floor& floorToPickup) {
-    return "";
+
+    bool hasUpRequest = floorToPickup.getHasUpRequest();
+    bool hasDownRequest = floorToPickup.getHasDownRequest();
+    string pickupList = "";
+    int currentFloor = move.getTargetFloor();
+    int upAnger = 0;
+    int downAnger = 0;
+    double upAvgAnger = 0;
+    double downAvgAnger = 0;
+    string up = "";
+    string down = "";
+
+    // if a floor only has people with up requests or down requests
+    if ((hasUpRequest && !hasDownRequest) || (!hasUpRequest && hasDownRequest)) {
+        for (int i = 0; i < floorToPickup.getNumPeople(); ++i) {
+            pickupList.append(to_string(i));
+        }
+        return pickupList;
+    }
+
+    // if a floor has people with highest anger level up/down
+    for (int j = 0; j < floorToPickup.getNumPeople(); ++j) {
+
+        // if a person wants to go up or down
+        if (currentFloor < floorToPickup.getPersonByIndex(j).getTargetFloor()) {
+            upAnger += floorToPickup.getPersonByIndex(j).getAngerLevel();
+            up.append(to_string(j));
+        }
+        else {
+            downAnger += floorToPickup.getPersonByIndex(j).getAngerLevel();
+            down.append(to_string(j));
+        }
+    }
+
+    // compute the average
+    upAvgAnger = upAnger * 1.0 / up.length();
+    downAvgAnger = downAnger * 1.0 / down.length();
+
+    // pick up whoever with larger average anger level
+    if (upAvgAnger > downAvgAnger) {
+        return up;
+    }
+    else if (upAvgAnger < downAvgAnger) {
+        return down;
+    }
+    else if (up.length() >= down.length()) {
+
+        // if the average is the same, compare the number of people 
+        return up;
+    }
+    return down;
 }
