@@ -13,13 +13,19 @@
 #include "AI.h"
 #include <cassert>
 #include <string>
-#include "Game.h"
+#include <iostream>
 using namespace std;
 
 // This file is used only in the Reach, not the Core.
 // You do not need to make any changes to this file for the Core
 
 string getAIMoveString(const BuildingState& buildingState) {
+
+    // first round
+    if (buildingState.turn == 0) {
+        return "e0f1";
+    }
+
     // Winning Stategy 1: go to the floor that has people with highest anger levels.
     int sumAnger;
     double avgAnger = 0;
@@ -32,7 +38,8 @@ string getAIMoveString(const BuildingState& buildingState) {
     int shortestD = NUM_FLOORS;
 
     // if all elevators are servicing, we should pass the round
-    if (buildingState.elevators[0].isServicing && buildingState.elevators[1].isServicing && buildingState.elevators[2].isServicing) {
+    if (buildingState.elevators[0].isServicing 
+        && buildingState.elevators[1].isServicing && buildingState.elevators[2].isServicing) {
         return "";
     }
 
@@ -41,40 +48,41 @@ string getAIMoveString(const BuildingState& buildingState) {
 
         // initialize sum everytime the loop iterates
         sumAnger = 0;
-        for (int i = 0; i < buildingState.floors->numPeople; ++i) {
-            sumAnger += buildingState.floors->people[i].angerLevel;
+        for (int i = 0; i < buildingState.floors[j].numPeople; ++i) {
+            sumAnger += buildingState.floors[j].people[i].angerLevel;
         }
 
         // get average anger level of each floor
-        avgAnger = sumAnger / (buildingState.floors->numPeople * 1.0);
+        avgAnger = sumAnger / (buildingState.floors[j].numPeople * 1.0);
 
-        // get the closest elevator
-        for (int k = 0; k < NUM_ELEVATORS; ++k) {
+        cout << "Sum: " << sumAnger << endl
+            << "Avg: " << avgAnger << endl;
 
-            // only if the elevator is available
-            if (!buildingState.elevators[k].isServicing) {
+        if (avgAnger > greatestAvgAnger/* && (MAX_ANGER - avgAnger) > shortestD*/) {
+            greatestAvgAnger = avgAnger;
+            targetFloor = buildingState.floors[j].floorNum;
+        }
+    }
 
-                elevId = buildingState.elevators[k].elevatorId;
-                distance = abs(buildingState.floors[j].floorNum
-                    - buildingState.elevators[k].currentFloor);
+    // get the closest elevator
+    for (int k = 0; k < NUM_ELEVATORS; ++k) {
 
-                if (shortestD < distance) {
-                    shortestD = distance;
-                    move.append(to_string(elevId));
-                    elevIdFinal = elevId;
-                }
+        // only if the elevator is available
+        if (!buildingState.elevators[k].isServicing) {
+
+            elevId = buildingState.elevators[k].elevatorId;
+            distance = abs(buildingState.floors[targetFloor].floorNum
+                - buildingState.elevators[k].currentFloor);
+
+            if (shortestD > distance) {
+                shortestD = distance;
+                elevIdFinal = elevId;
             }
         }
-
-        if (avgAnger > greatestAvgAnger && (MAX_ANGER - avgAnger) > shortestD) {
-            greatestAvgAnger = avgAnger;
-            targetFloor = buildingState.floors->floorNum;
-        }
-
-        // we should: differentiate sumAnger based on up/down requests -> impossible
-        // we should: ignore ppl that will explode no matter what AI does based
-        //            on the distance between the target floor & the elevator -> resolved
     }
+
+    // append the elevator ID
+    move.append(to_string(elevIdFinal));
 
     // pick up when targetFloor == currentFloor of the elevator
     if (targetFloor == buildingState.elevators[elevIdFinal].currentFloor) {
