@@ -20,17 +20,12 @@ using namespace std;
 // You do not need to make any changes to this file for the Core
 
 string getAIMoveString(const BuildingState& buildingState) {
-
-    // first round
-    //if (buildingState.turn == 0) {
-    //    return "e0f1";
-   // }
-
     // Winning Stategy 1: go to the floor that has people with highest anger levels.
     int sumAnger;
     double avgAnger = 0;
     int greatestAvgAnger = 0;
-    int targetFloor = 0;
+    int greatestSumAnger = 0;
+    int moveTargetFloor = 0;
     string move = "e";
     int elevId = 0;
     int elevIdFinal = 0;
@@ -54,16 +49,19 @@ string getAIMoveString(const BuildingState& buildingState) {
 
         // get average anger level of each floor
         avgAnger = sumAnger / (buildingState.floors[j].numPeople * 1.0);
-
-        cout << "Sum: " << sumAnger << endl
-            << "Avg: " << avgAnger << endl;
-
-        if (avgAnger > greatestAvgAnger/* && (MAX_ANGER - avgAnger) > shortestD*/) {
-            greatestAvgAnger = avgAnger;
-            targetFloor = buildingState.floors[j].floorNum;
+// version of code that chooses elevator based on greatest average anger 
+        bool alreadyTarget = false;
+        for (int l = 0; l < NUM_FLOORS; ++l) {
+            if (buildingState.elevators[l].targetFloor == moveTargetFloor) {
+                alreadyTarget = true;
+            }
         }
-    }
-
+        if (avgAnger > greatestAvgAnger && alreadyTarget == false) {
+        //(MAX_ANGER - avgAnger) > shortestD) {
+          greatestAvgAnger = avgAnger;
+          moveTargetFloor = buildingState.floors[j].floorNum;
+     }
+  }
     // get the closest elevator
     for (int k = 0; k < NUM_ELEVATORS; ++k) {
 
@@ -71,7 +69,7 @@ string getAIMoveString(const BuildingState& buildingState) {
         if (!buildingState.elevators[k].isServicing) {
 
             elevId = buildingState.elevators[k].elevatorId;
-            distance = abs(buildingState.floors[targetFloor].floorNum
+            distance = abs(buildingState.floors[moveTargetFloor].floorNum
                 - buildingState.elevators[k].currentFloor);
 
             if (shortestD > distance) {
@@ -85,8 +83,8 @@ string getAIMoveString(const BuildingState& buildingState) {
     move.append(to_string(elevIdFinal));
 
     // pick up when targetFloor == currentFloor of the elevator
-    if (targetFloor == buildingState.elevators[elevIdFinal].currentFloor) {
-        if (buildingState.floors[targetFloor].numPeople == 0) {
+    if (moveTargetFloor == buildingState.elevators[elevIdFinal].currentFloor) {
+        if (buildingState.floors[moveTargetFloor].numPeople == 0) {
             return "";
         }
         move.append("p");
@@ -95,7 +93,7 @@ string getAIMoveString(const BuildingState& buildingState) {
 
     // if not picking up, perform service move
     move.append("f");
-    move.append(to_string(targetFloor));
+    move.append(to_string(moveTargetFloor));
     return move;
 }
 
