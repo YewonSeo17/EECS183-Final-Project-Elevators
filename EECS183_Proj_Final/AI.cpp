@@ -22,9 +22,9 @@ using namespace std;
 string getAIMoveString(const BuildingState& buildingState) {
 
     // first round
-    if (buildingState.turn == 0) {
-        return "e0f1";
-    }
+    //if (buildingState.turn == 0) {
+    //    return "e0f1";
+   // }
 
     // Winning Stategy 1: go to the floor that has people with highest anger levels.
     int sumAnger;
@@ -86,6 +86,9 @@ string getAIMoveString(const BuildingState& buildingState) {
 
     // pick up when targetFloor == currentFloor of the elevator
     if (targetFloor == buildingState.elevators[elevIdFinal].currentFloor) {
+        if (buildingState.floors[targetFloor].numPeople == 0) {
+            return "";
+        }
         move.append("p");
         return move;
     }
@@ -102,7 +105,8 @@ string getAIPickupList(const Move& move, const BuildingState& buildingState,
     bool hasUpRequest = floorToPickup.getHasUpRequest();
     bool hasDownRequest = floorToPickup.getHasDownRequest();
     string pickupList = "";
-    int currentFloor = move.getTargetFloor();
+    int elevatorID = move.getElevatorId();
+    int currentFloor = buildingState.elevators[elevatorID].currentFloor;
     int upAnger = 0;
     int downAnger = 0;
     double upAvgAnger = 0;
