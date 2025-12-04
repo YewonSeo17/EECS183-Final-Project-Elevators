@@ -26,6 +26,7 @@ bool isInArray(int value, int arr[], int size) {
     return false;
 }
 
+//
 int nextBestFloor(const BuildingState& buildingState, int targetFloors[]) {
     int sumAnger = 0;
     // double avgAnger = 0.0;
@@ -47,7 +48,6 @@ int nextBestFloor(const BuildingState& buildingState, int targetFloors[]) {
             if (sumAnger > greatestSumAnger) {
                 greatestSumAnger = sumAnger;
                 moveTargetFloor = buildingState.floors[j].floorNum;
-                cout << "New target floor: " << moveTargetFloor << " with sum anger " << greatestSumAnger << endl;
             }
         }
     }
