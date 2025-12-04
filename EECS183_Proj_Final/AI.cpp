@@ -127,12 +127,15 @@ string getAIPickupList(const Move& move, const BuildingState& buildingState,
     string pickupList = "";
     int elevatorID = move.getElevatorId();
     int currentFloor = buildingState.elevators[elevatorID].currentFloor;
+    int upRequests = 0;
+    int downRequests = 0;
     int upAnger = 0;
     int downAnger = 0;
     double upAvgAnger = 0;
     double downAvgAnger = 0;
     string up = "";
     string down = "";
+
     // if a floor only has people with up requests or down requests
     if ((hasUpRequest && !hasDownRequest) || (!hasUpRequest && hasDownRequest)) {
         for (int i = 0; i < floorToPickup.getNumPeople(); ++i) {
@@ -140,31 +143,40 @@ string getAIPickupList(const Move& move, const BuildingState& buildingState,
         }
         return pickupList;
     }
-    // if a floor has people with highest anger level up/down
+
+    // if a floor has more people going up or down
     for (int j = 0; j < floorToPickup.getNumPeople(); ++j) {
         // if a person wants to go up or down
         if (currentFloor < floorToPickup.getPersonByIndex(j).getTargetFloor()) {
             upAnger += floorToPickup.getPersonByIndex(j).getAngerLevel();
             up.append(to_string(j));
+            upRequests++;
         }
         else {
             downAnger += floorToPickup.getPersonByIndex(j).getAngerLevel();
             down.append(to_string(j));
+            downRequests++;
         }
     }
+
     // compute the average
     upAvgAnger = upAnger * 1.0 / up.length();
     downAvgAnger = downAnger * 1.0 / down.length();
-    // pick up whoever with larger average anger level
-    if (upAvgAnger > downAvgAnger) {
+
+    // pick up all people in the greater requested direction
+    if (upRequests > downRequests) {
         return up;
     }
-    else if (upAvgAnger < downAvgAnger) {
+    else if (upRequests < downRequests) {
         return down;
     }
-    else if (up.length() >= down.length()) {
-        // if the average is the same, compare the number of people 
-        return up;
+    else if (upRequests == downRequests) {
+        if (upAvgAnger > downAvgAnger) {
+            return up;
+        }
+        else {
+            return down;
+        }
     }
     return down;
 }
